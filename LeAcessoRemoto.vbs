@@ -27,8 +27,9 @@ Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
  
 ' parametros recebidos
 dim nomearqremoto, data, nomeserver
-nomeserver = WScript.Arguments.Unnamed(0)
+nomeserver = acertaNomeServer(WScript.Arguments.Unnamed(0))
 nomearqremoto = WScript.Arguments.Unnamed(1)
+
 
 If WScript.Arguments.Count = 3 Then
 	data = WScript.Arguments.Unnamed(2)
@@ -59,7 +60,6 @@ Set hhrAcesso = CreateObject("scripting.dictionary")
 linhas = Split(arqremoto.ReadAll, Chr(13) & Chr(10))
 totalLinhas = arqremoto.Line
 arqremoto.Close
-
 
 For cont = 0 to (UBound(linhas) - 1)
 	linha = Trim(linhas(cont))
@@ -113,3 +113,18 @@ Next
 
 WScript.StdOut.WriteBlankLines 2
 WScript.Quit(0)
+
+
+' FUNÇÕES
+
+Function acertaNomeServer(nome)
+	Dim tkn, tmp
+	acertaNomeServer = nome
+	
+	If InStr(nome, "/") > 0 Then
+		tkn = Split(nome, "/")
+		tmp = tkn(UBound(tkn))
+		tkn = Split(tmp, ".")
+		acertaNomeServer = tkn(0)
+	End If
+End function
