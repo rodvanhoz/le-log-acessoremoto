@@ -1,10 +1,10 @@
-' Atulaliza o Obj da base teste e gera o arquivo
+' Le o arquivo de log dos acesso remotos e retorna os acessos de um ts passado por parametro do dia
 '
 ' retorno:
 '	0 -> Sem erros
 '	1 -> Erro de processamento
 '
-' Data: 21/06/2018
+' Data: 02/05/
 ' Author: Rodrigo Vanhoz Ribeiro
 '
 ' Versão: 1
@@ -15,8 +15,8 @@
 Option Explicit
 
 ' checagem de parametros
-If WScript.Arguments.Count <> 1 And WScript.Arguments.Count <> 5 Then
-	WScript.Echo "uso: LeAcessoRemoto [Conexao]"
+If WScript.Arguments.Count <> 2 And WScript.Arguments.Count <> 3 Then
+	WScript.Echo "uso: LeAcessoRemoto [Conexao] [Caminho LOG] [Data dd/MM/yyyy (deixar em branco traz a data do dia)]"
 	WScript.Echo ""
 	WScript.Quit( 1 )
 End if
@@ -26,8 +26,15 @@ Const ForReading = 1, ForWriting = 2, ForAppending = 8
 Const TristateUseDefault = -2, TristateTrue = -1, TristateFalse = 0
  
 ' parametros recebidos
-dim nomearqremoto
-nomearqremoto = "AcessoRemoto.log"
+dim nomearqremoto, data, nomeserver
+nomeserver = WScript.Arguments.Unnamed(0)
+nomearqremoto = WScript.Arguments.Unnamed(1)
+
+If WScript.Arguments.Count = 3 Then
+	data = WScript.Arguments.Unnamed(2)
+Else
+	data = Date 
+End If
 
 ' variaveis de arquivo
 dim fs, arqremoto, linhas, linha, totalLinhas, cont, continf, contAcesso, achou, x
@@ -47,23 +54,17 @@ Set husr      = CreateObject("scripting.dictionary")
 Set hdtAcesso = CreateObject("scripting.dictionary")
 Set hhrAcesso = CreateObject("scripting.dictionary")
 
+
 ' carregando arquivo
 linhas = Split(arqremoto.ReadAll, Chr(13) & Chr(10))
 totalLinhas = arqremoto.Line
 arqremoto.Close
-
-' para teste
-Dim data, nomeserver
-data = Date 
-nomeserver = WScript.Arguments.Unnamed(0)
 
 
 For cont = 0 to (UBound(linhas) - 1)
 	linha = Trim(linhas(cont))
 	If Left(linha, 2) <> "--" And Left(linha, 2) <> "" Then
 		continf = continf + 1
-'		WScript.echo CStr(cont) & " - " & linha
-'		WScript.Echo Mid(linha, 3, 1)
 		If Left(linha, 5) = "login" Then
 		    If login <> "" And achou = True Then
 		    	hlogin.Add contAcesso, login
@@ -112,4 +113,3 @@ Next
 
 WScript.StdOut.WriteBlankLines 2
 WScript.Quit(0)
-
